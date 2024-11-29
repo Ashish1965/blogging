@@ -6,39 +6,39 @@ import toast from "react-hot-toast";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import Link from "next/link";
-const home = () => {
-//   const { Tasks } = props;
+const home = (props) => {
+  const { Tasks } = props;
   //   console.log(Tasks);
 
-  const [Tasks, setTasks] = useState([]);
+  // const [Tasks, setTasks] = useState([]);
 
   const router = useRouter();
-  useEffect(() => {
-    const fetchData = async () => {
-      const cookie = nookies.get(null); // Get cookies on the client side
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     const cookie = nookies.get(null); // Get cookies on the client side
 
-      if (!cookie.token) {
-        router.push("/login"); // Redirect to login if token is missing
-        return;
-      }
+  //     if (!cookie.token) {
+  //       router.push("/login"); // Redirect to login if token is missing
+  //       return;
+  //     }
 
-      try {
-        const response = await fetch(`/api/task`, {
-          headers: {
-            Authorization: cookie.token,
-          },
-        });
-        if (!response.ok) throw new Error("Failed to fetch tasks");
+  //     try {
+  //       const response = await fetch(`/api/task`, {
+  //         headers: {
+  //           Authorization: cookie.token,
+  //         },
+  //       });
+  //       if (!response.ok) throw new Error("Failed to fetch tasks");
 
-        const data = await response.json();
-        setTasks(data);
-      } catch (error) {
-        console.error("Error fetching tasks:", error);
-      }
-    };
+  //       const data = await response.json();
+  //       setTasks(data);
+  //     } catch (error) {
+  //       console.error("Error fetching tasks:", error);
+  //     }
+  //   };
 
-    fetchData();
-  }, [router]); 
+  //   fetchData();
+  // }, [router]); 
 
   return (
     <section class="text-gray-600 body-font overflow-hidden mt-20 ">
@@ -124,46 +124,53 @@ const home = () => {
   );
 };
 
-// export async function getServerSideProps(ctx) {
-//     try {
-//       // Retrieve cookies
-//       const cookie = nookies.get(ctx);
-  
-//       // Redirect if token is not present
-//       if (!cookie.token) {
-//         const { res } = ctx;
-//         res.writeHead(302, { Location: "/login" });
-//         res.end();
-//         return { props: {} }; // Return an empty props object to prevent further processing
-//       }
-  
-//       // Fetch data from the API
-//       const response = await fetch(`${baseUrl}/api/task`, {
-//         headers: {
-//           Authorization: cookie.token,
-//         },
-//       });
-  
-//       // Parse JSON response
-//       const data = await response.json();
-  
-//       // Return the tasks as props
-//       return {
-//         props: {
-//           Tasks: data,
-//         },
-//       };
-//     } catch (error) {
-//       console.error("Error in getServerSideProps:", error);
-  
-//       // Handle errors gracefully, perhaps by redirecting or returning default props
-//       return {
-//         props: {
-//           Tasks: [], // Return an empty array or handle the error case appropriately
-//         },
-//       };
-//     }
-//   }
+export async function getServerSideProps(ctx) {
+  try {
+    // Retrieve token from cookies
+    const { token } = nookies.get(ctx);
+
+    // Redirect if token is not present
+    if (!token) {
+      return {
+        redirect: {
+          destination: "/login",
+          permanent: false, // Indicates it's a temporary redirect
+        },
+      };
+    }
+
+    // Fetch data from the API
+    const response = await fetch(`${baseUrl}/api/task`, {
+      headers: {
+        Authorization: token,
+      },
+    });
+
+    // Check if the response is OK, otherwise handle the error
+    if (!response.ok) {
+      throw new Error(`Failed to fetch tasks: ${response.statusText}`);
+    }
+
+    // Parse JSON response
+    const data = await response.json();
+
+    // Return tasks as props
+    return {
+      props: {
+        Tasks: data,
+      },
+    };
+  } catch (error) {
+    console.error("Error in getServerSideProps:", error);
+
+    // Return an empty tasks list in case of an error
+    return {
+      props: {
+        Tasks: [],
+      },
+    };
+  }
+}
   
 export default dynamic(() => Promise.resolve(home), { ssr: false });
 // export default home;

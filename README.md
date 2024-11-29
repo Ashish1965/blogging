@@ -23,5 +23,5 @@ npm package manager
 ### Steps
 Clone the repository.  
 Install all dependencies using command : npm Install.  
-Start the server using command : npm run devices
+Start the server using command : npm run dev
 

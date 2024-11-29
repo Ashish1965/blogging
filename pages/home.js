@@ -114,6 +114,4 @@ export async function getServerSideProps(ctx) {
     },
   };
 }
-
-// export default dynamic(() => Promise.resolve(home), { ssr: false });
 export default home;

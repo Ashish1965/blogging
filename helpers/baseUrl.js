@@ -1,2 +1,2 @@
-const baseUrl = 'https://anblog.vercel.app/';
+const baseUrl = 'https://anblog.vercel.app';
 export default baseUrl;

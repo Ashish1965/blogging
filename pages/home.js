@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import nookies from "nookies";
 import baseUrl from "@/helpers/baseUrl";
 import dynamic from "next/dynamic";
@@ -6,15 +6,46 @@ import toast from "react-hot-toast";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import Link from "next/link";
-const home = (props) => {
-  const { Tasks } = props;
+const home = () => {
+//   const { Tasks } = props;
   //   console.log(Tasks);
+
+  const [Tasks, setTasks] = useState([]);
+
+  const router = useRouter();
+  useEffect(() => {
+    const fetchData = async () => {
+      const cookie = nookies.get(null); // Get cookies on the client side
+
+      if (!cookie.token) {
+        router.push("/login"); // Redirect to login if token is missing
+        return;
+      }
+
+      try {
+        const response = await fetch(`/api/task`, {
+          headers: {
+            Authorization: cookie.token,
+          },
+        });
+        if (!response.ok) throw new Error("Failed to fetch tasks");
+
+        const data = await response.json();
+        setTasks(data);
+      } catch (error) {
+        console.error("Error fetching tasks:", error);
+      }
+    };
+
+    fetchData();
+  }, [router]); 
+
   return (
     <section class="text-gray-600 body-font overflow-hidden mt-20 ">
       <div class="container px-5 py-24 mx-auto">
         <div class="flex flex-wrap -m-12">
           {Tasks.map((Task) => (
-            <div class="p-12 md:w-1/2 flex flex-col items-start hover:bg-blue-50 hover:scale-105 active:scale-95 duration-300" key = {Task._id}>
+            <div class="p-12 md:w-1/2 flex flex-col items-start hover:bg-blue-50 hover:scale-105 active:scale-95 duration-300" key={Task._id}>
             <Link href={`/${Task._id}`}>
               <span class="inline-block py-1 px-2 rounded bg-indigo-50 text-indigo-500 text-xs font-medium tracking-widest">
                 CATEGORY
@@ -93,46 +124,46 @@ const home = (props) => {
   );
 };
 
-export async function getServerSideProps(ctx) {
-  try {
-    // Retrieve cookies
-    const cookie = nookies.get(ctx);
-
-    // Redirect if token is not present
-    if (!cookie.token) {
-      const { res } = ctx;
-      res.writeHead(302, { Location: "/login" });
-      res.end();
-      return { props: {} }; // Return an empty props object to prevent further processing
-    }
-
-    // Fetch data from the API
-    const response = await fetch(`${baseUrl}/api/task`, {
-      headers: {
-        Authorization: cookie.token,
-      },
-    });
-
-    // Parse JSON response
-    const data = await response.json();
-
-    // Return the tasks as props
-    return {
-      props: {
-        Tasks: data,
-      },
-    };
-  } catch (error) {
-    console.error("Error in getServerSideProps:", error);
-
-    // Handle errors gracefully, perhaps by redirecting or returning default props
-    return {
-      props: {
-        Tasks: [], // Return an empty array or handle the error case appropriately
-      },
-    };
-  }
-}
-
+// export async function getServerSideProps(ctx) {
+//     try {
+//       // Retrieve cookies
+//       const cookie = nookies.get(ctx);
+  
+//       // Redirect if token is not present
+//       if (!cookie.token) {
+//         const { res } = ctx;
+//         res.writeHead(302, { Location: "/login" });
+//         res.end();
+//         return { props: {} }; // Return an empty props object to prevent further processing
+//       }
+  
+//       // Fetch data from the API
+//       const response = await fetch(`${baseUrl}/api/task`, {
+//         headers: {
+//           Authorization: cookie.token,
+//         },
+//       });
+  
+//       // Parse JSON response
+//       const data = await response.json();
+  
+//       // Return the tasks as props
+//       return {
+//         props: {
+//           Tasks: data,
+//         },
+//       };
+//     } catch (error) {
+//       console.error("Error in getServerSideProps:", error);
+  
+//       // Handle errors gracefully, perhaps by redirecting or returning default props
+//       return {
+//         props: {
+//           Tasks: [], // Return an empty array or handle the error case appropriately
+//         },
+//       };
+//     }
+//   }
+  
 export default dynamic(() => Promise.resolve(home), { ssr: false });
-
+// export default home;

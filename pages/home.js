@@ -10,11 +10,11 @@ const home = (props) => {
   const { Tasks } = props;
   //   console.log(Tasks);
   return (
-    <section class="text-gray-600 body-font overflow-hidden">
+    <section class="text-gray-600 body-font overflow-hidden mt-20 ">
       <div class="container px-5 py-24 mx-auto">
         <div class="flex flex-wrap -m-12">
           {Tasks.map((Task) => (
-            <div class="p-12 md:w-1/2 flex flex-col items-start">
+            <div class="p-12 md:w-1/2 flex flex-col items-start hover:bg-blue-50 hover:scale-105 active:scale-95 duration-300">
             <Link href={`/${Task._id}`}>
               <span class="inline-block py-1 px-2 rounded bg-indigo-50 text-indigo-500 text-xs font-medium tracking-widest">
                 CATEGORY

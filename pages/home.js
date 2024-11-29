@@ -14,7 +14,7 @@ const home = (props) => {
       <div class="container px-5 py-24 mx-auto">
         <div class="flex flex-wrap -m-12">
           {Tasks.map((Task) => (
-            <div class="p-12 md:w-1/2 flex flex-col items-start hover:bg-blue-50 hover:scale-105 active:scale-95 duration-300">
+            <div class="p-12 md:w-1/2 flex flex-col items-start hover:bg-blue-50 hover:scale-105 active:scale-95 duration-300" key = {Task._id}>
             <Link href={`/${Task._id}`}>
               <span class="inline-block py-1 px-2 rounded bg-indigo-50 text-indigo-500 text-xs font-medium tracking-widest">
                 CATEGORY

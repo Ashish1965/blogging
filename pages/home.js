@@ -74,7 +74,7 @@ const home = (props) => {
               <a class="inline-flex items-center">
                 <img
                   alt="blog"
-                  src="https://dummyimage.com/104x104"
+                  src="/account.jpg"
                   class="w-12 h-12 rounded-full flex-shrink-0 object-cover object-center"
                 />
                 <span class="flex-grow flex flex-col pl-4">

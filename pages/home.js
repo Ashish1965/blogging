@@ -94,25 +94,45 @@ const home = (props) => {
 };
 
 export async function getServerSideProps(ctx) {
-  const cookie = nookies.get(ctx);
+  try {
+    // Retrieve cookies
+    const cookie = nookies.get(ctx);
 
-  if (!cookie.token) {
-    const { res } = ctx;
-    res.writeHead(302, { Location: "/login" });
-    res.end();
+    // Redirect if token is not present
+    if (!cookie.token) {
+      const { res } = ctx;
+      res.writeHead(302, { Location: "/login" });
+      res.end();
+      return { props: {} }; // Return an empty props object to prevent further processing
+    }
+
+    // Fetch data from the API
+    const response = await fetch(`${baseUrl}/api/task`, {
+      headers: {
+        Authorization: cookie.token,
+      },
+    });
+
+    // Parse JSON response
+    const data = await response.json();
+
+    // Return the tasks as props
+    return {
+      props: {
+        Tasks: data,
+      },
+    };
+  } catch (error) {
+    console.error("Error in getServerSideProps:", error);
+
+    // Handle errors gracefully, perhaps by redirecting or returning default props
+    return {
+      props: {
+        Tasks: [], // Return an empty array or handle the error case appropriately
+      },
+    };
   }
-  const res = await fetch(`${baseUrl}/api/task`, {
-    headers: {
-      Authorization: cookie.token,
-    },
-  });
-  const res2 = await res.json();
-  // console.log(res2);
-  return {
-    props: {
-      Tasks: res2,
-    },
-  };
 }
+
 export default dynamic(() => Promise.resolve(home), { ssr: false });
 
